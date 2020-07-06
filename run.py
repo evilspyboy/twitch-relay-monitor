@@ -30,7 +30,8 @@ while True:
 
 	last_hype_train_action=get_last_hype_train_action(client_id,access_token,broadcaster["_id"])
 	if(is_train_active(last_hype_train_action["data"])):
-		print("Train Active at level ",last_hype_train_action["data"]['level'])
+		#pprint.pprint(last_hype_train_action["data"])
+		print("Train Active at level ",last_hype_train_action["data"][0]["event_data"]['level'])
 		wait_time=5
 	else:
 		print("Train not active")

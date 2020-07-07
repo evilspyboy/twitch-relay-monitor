@@ -8,9 +8,16 @@ def get_token(client_id,client_secret,grant_type,scope):
 		client_id+"&client_secret="+ \
 		client_secret+"&grant_type="+ \
 		grant_type+"&scope="+scope
-	response = requests.request("POST",url)
-	r=json.loads(response.text)
-	return r
+	try:
+		response = requests.request("POST",url)
+		r=json.loads(response.text)
+		return r
+	except requests.Timeout as err:
+		print("get_token timeout")
+		return False
+	except Exception as e:
+		print("get_token network error ",e.message)
+		return False
 
 def get_last_hype_train_action(client_id,access_token,user_id):
 	url = "https://api.twitch.tv/helix/hypetrain/events?broadcaster_id="+ \
@@ -20,8 +27,15 @@ def get_last_hype_train_action(client_id,access_token,user_id):
 	  'Client-ID': client_id,
 	  'Authorization': 'Bearer '+access_token
 	}
-	response = requests.request("GET", url, headers=headers)
-	return json.loads(response.text)
+	try:
+		response = requests.request("GET", url, headers=headers)
+		return json.loads(response.text)
+	except requests.Timeout as err:
+		print("get hype train action timeout")
+		return False
+	except Exception as e:
+		print("get hype train action network error ",e.message)
+		return False
 
 
 def get_broadcaster_id(client_id,username):
@@ -30,9 +44,16 @@ def get_broadcaster_id(client_id,username):
 	  'Accept': 'application/vnd.twitchtv.v5+json',
 	  'Client-ID': client_id
 	}
-	response = requests.request("GET", url, headers=headers)
-	r=json.loads(response.text)
-	return r['users'][0]
+	try:
+		response = requests.request("GET", url, headers=headers)
+		r=json.loads(response.text)
+		return r['users'][0]
+	except requests.Timeout as err:
+		print("get_broadcaster_id timeout")
+		return False
+	except Exception as e:
+		print("get_broadcaster_id network error ",e.message)
+		return False
 
 def is_train_active(train_data):
 	# pprint.pprint(train_data)
@@ -47,20 +68,24 @@ def is_train_active(train_data):
 
 def is_user_live(client_id,access_token,username):
 	import requests
-
 	url = "https://api.twitch.tv/helix/streams?user_login="+username
-
-	payload = {}
+	
 	headers = {
 	  'Client-ID': client_id,
 	  'Authorization': 'Bearer '+access_token
 	}
-
-	response = requests.request("GET", url, headers=headers, data = payload)
-	r=json.loads(response.text)
-	if len(r["data"])==0:
+	try:
+		response = requests.request("GET", url, headers=headers, timeout=30)
+		r=json.loads(response.text)
+		if len(r["data"])==0:
+			return False
+		return True
+	except requests.Timeout as err:
+		print("is_user_live timeout")
 		return False
-	return True
+	except Exception as e:
+		print("can not check if user live ",e.message)
+		return False
 
 def is_valid_token(access_token):
 	
@@ -68,13 +93,19 @@ def is_valid_token(access_token):
 	headers = {
 	  'Authorization': 'OAuth '+access_token
 	}
-
-	response = requests.request("GET", url, headers=headers,)
-	r=json.loads(response.text)
-	if "expires_in" in r :
-		if r['expires_in'] < 60*60*24: #1 day
+	try:
+		response = requests.request("GET", url, headers=headers,)
+		r=json.loads(response.text)
+		if "expires_in" in r :
+			if r['expires_in'] < 60*60*24: #1 day
+				return False
+		else:
 			return False
-	else:
+	except requests.Timeout as err:
+		print("is_valid_token timeout")
 		return False
+	except Exception as e:
+		print("is_valid_token network error ",e.message)
+		return False	
 	return True
 	

@@ -19,7 +19,7 @@ fresh_token_interval=token_validate_interval
 
 skip_count=0
 while True:
-	wait_time=30
+	wait_time=online_user_wait_time
 	
 	# refresh token if expired 
 	if fresh_token_interval <30:
@@ -50,11 +50,13 @@ while True:
 		continue
 	if(is_train_active(last_hype_train_action["data"])):
 		#pprint.pprint(last_hype_train_action["data"])
+		precent=int(round(last_hype_train_action["data"][0]["event_data"]['total']*100/last_hype_train_action["data"][0]["event_data"]['goal']))
 		print("Train Active at level ",last_hype_train_action["data"][0]["event_data"]['level'])
+		print("Level complete %: ",precent)
 		wait_time=5
 	else:
 		print("Train not active")
-		wait_time=30
+		wait_time=online_user_wait_time
 	#check hype train cooldown_end_time
 	if "data" in last_hype_train_action:
 		if len(last_hype_train_action["data"]) >0:

@@ -16,7 +16,7 @@ def get_token(client_id,client_secret,grant_type,scope):
 		print("get_token timeout")
 		return False
 	except Exception as e:
-		print("get_token network error ",e.message)
+		print("get_token network error")
 		return False
 
 def get_last_hype_train_action(client_id,access_token,user_id):
@@ -34,7 +34,7 @@ def get_last_hype_train_action(client_id,access_token,user_id):
 		print("get hype train action timeout")
 		return False
 	except Exception as e:
-		print("get hype train action network error ",e.message)
+		print("get hype train action network error ")
 		return False
 
 
@@ -52,7 +52,7 @@ def get_broadcaster_id(client_id,username):
 		print("get_broadcaster_id timeout")
 		return False
 	except Exception as e:
-		print("get_broadcaster_id network error ",e.message)
+		print("get_broadcaster_id network error ")
 		return False
 
 def is_train_active(train_data):
@@ -84,7 +84,7 @@ def is_user_live(client_id,access_token,username):
 		print("is_user_live timeout")
 		return False
 	except Exception as e:
-		print("can not check if user live ",e.message)
+		print("can not check if user live ")
 		return False
 
 def is_valid_token(access_token):
@@ -105,7 +105,7 @@ def is_valid_token(access_token):
 		print("is_valid_token timeout")
 		return False
 	except Exception as e:
-		print("is_valid_token network error ",e.message)
+		print("is_valid_token network error ")
 		return False	
 	return True
 	

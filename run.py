@@ -28,7 +28,7 @@ while True:
 			r=get_token(client_id,client_secret,grant_type,scope)
 			if r ==False:
 				skip_count=skip_count+1
-				print("Skipp get token , skip:", skip)
+				print("Skipp get token , skip:", skip_count)
 				time.sleep(skip_wait_time)
 				continue
 			access_token=r['access_token'];
@@ -45,7 +45,7 @@ while True:
 	last_hype_train_action=get_last_hype_train_action(client_id,access_token,broadcaster["_id"])
 	if last_hype_train_action ==False:
 		skip_count=skip_count+1
-		print("Skipp get token , skip:", skip)
+		print("Skipp get token , skip:", skip_count)
 		time.sleep(skip_wait_time)
 		continue
 	if(is_train_active(last_hype_train_action["data"])):

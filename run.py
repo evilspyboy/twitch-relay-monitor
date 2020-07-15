@@ -4,7 +4,7 @@ from config import *
 from helper import *
 import time
 
-#first start by getting token to access twitch api
+#First, start by getting token to access Twitch api
 r=get_token(client_id,client_secret,grant_type,scope)
 if r == False:
     # if there is a problem, end the program
@@ -26,11 +26,11 @@ if "access_token" not in r:
 access_token=r['access_token'];
 expires_in=r['expires_in']
 
-# fresh token interval will keep track of the time we need to validate the token
+# Fresh token interval will keep track of the time we need to validate the token
 fresh_token_interval=token_validate_interval
 skip_count=0
 wait_type="nt" #nt: no hype train, cd: cooldown, at: active hype train
-# store old value of wait_type to clear the LED display when the new event happen.
+# save old value of wait_type to clear the LED display when the new event happen.
 prev_wait_type="nt"
 #for active train 
 prev_x=1
@@ -126,5 +126,3 @@ while True:
 	time.sleep(wait_time)
 	#reset skip_count if one request execute without issue within max_skip_count
 	skip_count=0 
-
-

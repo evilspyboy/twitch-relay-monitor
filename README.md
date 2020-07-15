@@ -26,7 +26,9 @@ There are three hype train stages, the time for each stage change be change base
 ![Train progress](svg/train-progress.svg)
 
 When the hype train starts the display will show the level of the hype train and the level percentage of the level.
+
 The hype train levelstartsfrom 1 to 5, percentage increase can bechangedin hype train difficulty setting.
+
 The active hype train timestartsat 5 minutes and reset to 5 minutes every time the train complete a level.
 
 ### Cooldown
@@ -34,6 +36,7 @@ The active hype train timestartsat 5 minutes and reset to 5 minutes every time t
 
 After the hype train finish a cooldown will start, when the train in a cooldown state, the users can not trigger the
 type train, streamer can  set the cooldown to be from 1 to 8 hours.
+
 The watch above is based 12, it is based on this project [rectangle-scrollphathd-watch](https://github.com/plusmnt/rectangle-scrollphathd-watch), 
 the only change is the watch will work backwards.
 

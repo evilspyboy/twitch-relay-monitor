@@ -12,7 +12,7 @@ This tool will connect a streamer hype train with raspberry pi zero and Scroll p
 - The display should show the status of the hype train
 
 
-## How It Work
+## How it work
 ![Hype train timeline](svg/stream_time_line.svg)
 
 
@@ -22,7 +22,7 @@ The tool will use [Twich API](https://dev.twitch.tv/docs/api/) to check if the t
 
 There are three hype train stages, the time for each stage change be change based on the user interaction or streamer setting.
 
-### Active Hype Train
+### Active hype train
 ![Train progress](svg/train-progress.svg)
 
 When the hype train starts the display will show the level of the hype train and the level percentage of the level.
@@ -39,7 +39,7 @@ the only change is the watch will work backwards.
 
 The tool will not make any server call in this stage since the hype train cannot be triggered until the cooldown end.
 
-### No Hype Train
+### No hype train
 ![no hype train random do](svg/random_dot.svg)
 
 When the streamer are offline or thecooldownperiod end a random dot will appear in the display, thedotswill appear with random brightness value (0, 0.5).
@@ -54,11 +54,11 @@ When the streamer are offline or thecooldownperiod end a random dot will appear 
 | username                | streamer username                                                            | not empty               |
 | user_offline_wait_time  | time in seconds to wait between request if the user not streaming            | 60                      |
 | online_user_wait_time   | time in seconds to wait between request if the user streaming                | 30                      |
-| token_validate_interval | time in seconds  to check if the token is valid                              | 60*60*1                 |
+| token_validate_interval | time in seconds  to check if the token is valid                              | 3600                    |
 | max_skip_count          | maximum number of skipping when there is a problem before the program stop   | 5                       |
 | skip_wait_time          | cooldown time in seconds before sending a new request when an error happens. | 5                       |
 
-### Config Note 
+### Config note 
 - If you are looking to test the hype train active display, you can get one of the usernames from streams with `hype train` tag e.g. [Hype train live stream](https://www.twitch.tv/directory/all/tags/c2839af5-f1d2-46c4-8edc-1d0bfbd85070)
 
 ## Hardware
@@ -76,5 +76,5 @@ the code consists of 3 main files
 - `run.py`: this is the main file that use above two files to run, this file contains the logic of running the program.
 
 
-## Futrue Idea
+## Futrue idea
 It is possible to attach raspberry pi to a real toy train and make it run when the hype train active.

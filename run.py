@@ -7,19 +7,19 @@ import time
 #First, start by getting token to access Twitch api
 r=get_token(client_id,client_secret,grant_type,scope)
 if r == False:
-    # if there is a problem, end the program
+	# if there is a problem, end the program
 	print("Can't Auth user")
 	exit(1)
 
 # since streamer username is given we need to get its broadcaster id for other requests
 broadcaster=get_broadcaster_id(client_id,username)
 if broadcaster==False:
-    # if there is a problem, end the program
+	# if there is a problem, end the program
 	print("Can not get broadcster id")
 	exit(1)
 
 if "access_token" not in r:
-    # if there is a problem, end the program
+	# if there is a problem, end the program
 	print("Access token is missing ", r)
 	exit(1)
 	
@@ -108,7 +108,7 @@ while True:
 		while wait_time > 0:
 			next_hype_train=datetime.datetime.strptime(last_hype_train_action["data"][0]["event_data"]["cooldown_end_time"]  ,'%Y-%m-%dT%H:%M:%SZ')
 			if datetime.datetime.utcnow() >= next_hype_train:
-			    break 
+				break 
 			show_time(next_hype_train)
 			time.sleep(1)
 			wait_time =wait_time-1

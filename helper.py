@@ -150,36 +150,36 @@ def is_user_live(client_id,access_token,username):
 # the function show or hide one pixel first, then hide random pixel
 
 def rand_pixel():
-    x =random.randint(1,15)
-    y =random.randint(1,5)
-    b =random.randint(0,5)/10
-    scrollphathd.set_pixel(x,y,b)
-    x =random.randint(1,15)
-    y =random.randint(1,5)
-    scrollphathd.set_pixel(x,y,0)
-    scrollphathd.show()
-    
+	x =random.randint(1,15)
+	y =random.randint(1,5)
+	b =random.randint(0,5)/10
+	scrollphathd.set_pixel(x,y,b)
+	x =random.randint(1,15)
+	y =random.randint(1,5)
+	scrollphathd.set_pixel(x,y,0)
+	scrollphathd.show()
+	
 
 # Get the location of the number in the rectangle watch
 # giving sx as start X point and n as a number
 # return x and y location 
-    
+	
 def get_loc(sx,n):
-    if n ==12:
-        n=0
-    if n ==0 or n == 6:
-        y=1
-        if n ==6:
-            y =5
-        return sx+1,y
-    if n <= 5:
-        y =n
-        x=sx+2
-        return x,y
-    if n >=7:
-        y =12-n
-        x =sx
-        return x,y
+	if n ==12:
+		n=0
+	if n ==0 or n == 6:
+		y=1
+		if n ==6:
+			y =5
+		return sx+1,y
+	if n <= 5:
+		y =n
+		x=sx+2
+		return x,y
+	if n >=7:
+		y =12-n
+		x =sx
+		return x,y
 
 # Cooldown
 # Show 12 base watch countdown after the train end.
@@ -188,44 +188,44 @@ def get_loc(sx,n):
 # the output will be shown in the scrollphathd LED
 
 def show_time(future):
-    now=datetime.datetime.utcnow()
-    diff = future-now
-    print("Cooldown timer:",diff)
-    time_str=str(diff).split(":")
+	now=datetime.datetime.utcnow()
+	diff = future-now
+	print("Cooldown timer:",diff)
+	time_str=str(diff).split(":")
 
-    #Draw 3 rectangles background
-    #sq: will give 1, 7, 13 as x starting point
-    for sq in range(1, 15, 6):
-        for sx in range(sq,sq+3):
-            for sy in range(1,6):
-                if sx ==sq+1 :
-                    if sy !=1 and sy !=5:
-                        continue
-                scrollphathd.set_pixel(sx,sy,0.13)
+	#Draw 3 rectangles background
+	#sq: will give 1, 7, 13 as x starting point
+	for sq in range(1, 15, 6):
+		for sx in range(sq,sq+3):
+			for sy in range(1,6):
+				if sx ==sq+1 :
+					if sy !=1 and sy !=5:
+						continue
+				scrollphathd.set_pixel(sx,sy,0.13)
 
 #Draw ':'
-    scrollphathd.set_pixel(5,2,0.13)
-    scrollphathd.set_pixel(5,4,0.13)
-    scrollphathd.set_pixel(11,2,0.13)
-    scrollphathd.set_pixel(11,4,0.13)
+	scrollphathd.set_pixel(5,2,0.13)
+	scrollphathd.set_pixel(5,4,0.13)
+	scrollphathd.set_pixel(11,2,0.13)
+	scrollphathd.set_pixel(11,4,0.13)
 
-    #set time
-    second_12_base=int(float(time_str[2])/5+0.5)
-    sec_x,sec_y=get_loc(13,second_12_base)
-    scrollphathd.set_pixel(sec_x,sec_y,0.5)
-    
-    minute_12_base=int(int(time_str[1])/5+0.5)
-    if int(time_str[1]) != 0:
-        min_x,min_y=get_loc(7,minute_12_base)
-        scrollphathd.set_pixel(min_x,min_y,0.5)
+	#set time
+	second_12_base=int(float(time_str[2])/5+0.5)
+	sec_x,sec_y=get_loc(13,second_12_base)
+	scrollphathd.set_pixel(sec_x,sec_y,0.5)
+	
+	minute_12_base=int(int(time_str[1])/5+0.5)
+	if int(time_str[1]) != 0:
+		min_x,min_y=get_loc(7,minute_12_base)
+		scrollphathd.set_pixel(min_x,min_y,0.5)
 
-    hour=int(time_str[0])
-    if hour !=0:
-        if hour >12:
-            hour=hour-12
-        hour_x,hour_y=get_loc(1,hour)
-        scrollphathd.set_pixel(hour_x,hour_y,0.5)
-    scrollphathd.show()
+	hour=int(time_str[0])
+	if hour !=0:
+		if hour >12:
+			hour=hour-12
+		hour_x,hour_y=get_loc(1,hour)
+		scrollphathd.set_pixel(hour_x,hour_y,0.5)
+	scrollphathd.show()
 
 
 # Active train function
@@ -237,38 +237,38 @@ def show_time(future):
 
 def progress_show(level,per,prev_x,prev_y):
 
-    #max value for x in the led display
-    max_x=11
-    fix_x=prev_x
-    fix_y=prev_y
-    # get the upper value of the percentage e.g. 4.1 = 5
-    cal_x = math.ceil(per /10)
-    #print("Cal_x:",cal_x)
-    if cal_x >=max_x:
-        cal_x=max_x
-    for y in range(fix_y,level,1):
-        x_limit=max_x
-        if y == level-1:
-            x_limit=cal_x+1
-            if x_limit >= max_x:
-                x_limit =max_x
-        for x in range(fix_x,x_limit):
-            if prev_x !=1 or prev_y !=5 :
-                scrollphathd.set_pixel(prev_x,5-prev_y,0.1)
-            scrollphathd.set_pixel(x,5-y,0.3)
-            scrollphathd.clear_rect(x=13,y=1,width=3,height=5)
-            scrollphathd.write_string(str(y+1),x=13, y=1, font=font3x5, brightness=0.3)
-            scrollphathd.show()
-            time.sleep(0.1)
-            prev_x=x
-            prev_y=y
-        
-        fix_x=1
+	#max value for x in the led display
+	max_x=11
+	fix_x=prev_x
+	fix_y=prev_y
+	# get the upper value of the percentage e.g. 4.1 = 5
+	cal_x = math.ceil(per /10)
+	#print("Cal_x:",cal_x)
+	if cal_x >=max_x:
+		cal_x=max_x
+	for y in range(fix_y,level,1):
+		x_limit=max_x
+		if y == level-1:
+			x_limit=cal_x+1
+			if x_limit >= max_x:
+				x_limit =max_x
+		for x in range(fix_x,x_limit):
+			if prev_x !=1 or prev_y !=5 :
+				scrollphathd.set_pixel(prev_x,5-prev_y,0.1)
+			scrollphathd.set_pixel(x,5-y,0.3)
+			scrollphathd.clear_rect(x=13,y=1,width=3,height=5)
+			scrollphathd.write_string(str(y+1),x=13, y=1, font=font3x5, brightness=0.3)
+			scrollphathd.show()
+			time.sleep(0.1)
+			prev_x=x
+			prev_y=y
+		
+		fix_x=1
 
-    return prev_x,prev_y
+	return prev_x,prev_y
 
 # clear ScrollpHatHD led display
 def clear_pixel():
-    scrollphathd.clear()
-    scrollphathd.show()
+	scrollphathd.clear()
+	scrollphathd.show()
 

@@ -243,7 +243,7 @@ def progress_show(level,per,prev_x,prev_y):
     fix_y=prev_y
     # get the upper value of the percentage e.g. 4.1 = 5
     cal_x = math.ceil(per /10)
-    print("Cal_x:",cal_x)
+    #print("Cal_x:",cal_x)
     if cal_x >=max_x:
         cal_x=max_x
     for y in range(fix_y,level,1):

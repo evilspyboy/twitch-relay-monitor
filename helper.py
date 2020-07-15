@@ -6,10 +6,10 @@ import scrollphathd
 import time
 import math
 from scrollphathd.fonts import font3x5
-# First you need to register you application to get Client id and client secret
+# First, you need to register your application to get Client id and client secret
 # https://dev.twitch.tv/docs/authentication#registration
 
-# Get app token to access twich API
+# Get app token to access Twich API
 # https://dev.twitch.tv/docs/authentication#introduction
 # return auth. object or False if an error happen.
 
@@ -33,7 +33,7 @@ def get_token(client_id,client_secret,grant_type,scope):
 		print("get_token network error")
 		return False
 
-# Check if the token is valid no not.
+# Check if the token is valid or not.
 # return True if valid and False if invalid or network error
 # https://dev.twitch.tv/docs/authentication#validating-requests
 def is_valid_token(access_token):
@@ -59,7 +59,7 @@ def is_valid_token(access_token):
 	return True
 
 
-# get last train information
+# Get last train information
 # https://dev.twitch.tv/docs/api/webhooks-reference/#topic-hype-train-event
 # user id is long value returned from get_broadcaster_id using username
 # return last hype train action or false if there is a problem
@@ -81,7 +81,7 @@ def get_last_hype_train_action(client_id,access_token,user_id):
 		print("get hype train action network error ")
 		return False
 
-# get broadcaster id from its username
+# Get broadcaster id from its username
 # https://dev.twitch.tv/docs/v5/reference/users/#get-users
 # return user object 
 
@@ -102,8 +102,8 @@ def get_broadcaster_id(client_id,username):
 		print("get_broadcaster_id network error ")
 		return False
 
-# check if tain is active by comparing current UTC time with hype train `expires_at`
-# return True if the train active, return False if the train end.
+# Check if the train is active by comparing current UTC time with hype train `expires_at`
+# return True if the train active, return False if the train inactive.
 
 def is_train_active(train_data):
 	# pprint.pprint(train_data)
@@ -116,7 +116,7 @@ def is_train_active(train_data):
 		return False
 	return True
 
-# check if the user streaming
+# Check if the user streaming
 # https://dev.twitch.tv/docs/api/reference#get-streams
 # return True if the user streaming, return False if the user offline
 
@@ -145,8 +145,8 @@ def is_user_live(client_id,access_token,username):
 
 # LED functions
 
-# this function will run when the train is not active.
-# show random led pixel in random x,y location with brighness range from 0.1 to 0.5
+# This function will run when the train is inactive.
+# show random led pixel in random x, y location with a brightness range from 0.1 to 0.5
 # the function show or hide one pixel first, then hide random pixel
 
 def rand_pixel():
@@ -160,7 +160,7 @@ def rand_pixel():
     scrollphathd.show()
     
 
-# get location of the number in the rectangle watch
+# Get the location of the number in the rectangle watch
 # giving sx as start X point and n as a number
 # return x and y location 
     
@@ -182,7 +182,7 @@ def get_loc(sx,n):
         return x,y
 
 # Cooldown
-# show 12 base watch countdown after the train end.
+# Show 12 base watch countdown after the train end.
 # based on this project: https://github.com/plusmnt/rectangle-scrollphathd-watch
 # take future as datetime object and subtract it from utc now
 # the output will be shown in the scrollphathd LED
@@ -229,10 +229,10 @@ def show_time(future):
 
 
 # Active train function
-# show the prorgress and the level of hype train.
-# the funcation hype train level, pre as percentage (goal/total),  previous x value and previous y value.
+# show the progress and the level of hype train.
+# the function hype train level, pre as percentage (goal/total),  previous x value and previous y value.
 # from 1 to 11 x value it will show the progress of the train.
-# if the train pass 100% the led will stop in the last level 5 dot.
+# if the train passes 100% the LED will stop in the last level 5 dot.
 # the output will be shown in the scrollphatHD led display.
 
 def progress_show(level,per,prev_x,prev_y):

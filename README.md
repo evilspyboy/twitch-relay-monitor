@@ -79,5 +79,5 @@ the code consists of 3 main files
 - `run.py`: this is the main file that use above two files to run, this file contains the logic of running the program.
 
 
-## Futrue idea
+## Future idea
 It is possible to attach raspberry pi to a real toy train and make it run when the hype train active.

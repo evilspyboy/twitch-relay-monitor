@@ -3,6 +3,9 @@ All code credit should go to https://github.com/plusmnt/twitch-train-led as the 
 
 So I know some people who host a weekly live show on Twitch and it was discussed about having something explode when a Hype Train happens. As this seems a bit.... firey deathy, I decided to make a device that will give more options, through setting electrical relays that can be connected to lights/motors/inflateable wackyman air pumps/etc to be triggered when the corresponding Twitch event occurs. Limited to the events that are available through teh Twitch API that will work with this type of device without substantial more technical knowledge and setup.
 
+# How to make
+Check the [hackaday.io Project Page](https://github.com/evilspyboy/twitch-relay-monitor) if you want to do all the 3D printing, laser cutting and assembly bits. There are copies of all the files there but also a link back here and a link to a copy of just the 3D printed parts + files for laser cutting shared on Thingiverse
+
 ## How to use
 The device itself uses the Twitch API so you need a Client ID and Secret from the Twitch Developer Portal. As we are not retrieving any information that Twitch deems personal through these functions you do not necessarily have to have a API key created under the channel you are using this on but it does help to keep things together. Put the Client ID + Secret + Channel ID into the configuration file and you are 90% good to go if you have all the hardware configured and connected correctly (refer to the Hackaday.io for more on the hardware build + files).
 

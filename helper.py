@@ -1,11 +1,44 @@
+import sys
+import gpiozero
 import requests
 import datetime
 import json
 import random
-import scrollphathd
 import time
 import math
-from scrollphathd.fonts import font3x5
+from config import enable_stream
+from config import enable_hype
+from config import enable_follow
+from config import enable_spare
+
+import logging
+from logging.handlers import RotatingFileHandler
+
+logger = logging.getLogger('Twitch Relay Monitor Helper')
+logger.setLevel(logging.DEBUG)
+handler = RotatingFileHandler('/home/pi/twitch_relay_monitor/logs/helper.log', maxBytes=200000,backupCount=2)
+handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+logger.addHandler(handler)
+
+RELAY_PIN_1 = 4		#RELAY 1 / GPIO 4 / PIN 7
+RELAY_PIN_2 = 17	#RELAY 2 / GPIO 17 / PIN 11
+RELAY_PIN_3 = 27	#RELAY 3 / GPIO 27 / PIN 13
+RELAY_PIN_4 = 22	#RELAY 4 / GPIO 22 / PIN 15
+RELAY_PIN_5 = 24	#RELAY 5 / GPIO 24 / PIN 18
+RELAY_PIN_6 = 25 	#RELAY 6 / GPIO 25 / PIN 22
+RELAY_PIN_7 = 8 	#RELAY 7 / GPIO 8 / PIN 24
+RELAY_PIN_8 = 7 	#RELAY 8 / GPIO 7 / PIN 26
+
+
+relay1 = gpiozero.OutputDevice(RELAY_PIN_1, active_high=False, initial_value=False)
+relay2 = gpiozero.OutputDevice(RELAY_PIN_2, active_high=False, initial_value=False)
+relay3 = gpiozero.OutputDevice(RELAY_PIN_3, active_high=False, initial_value=False)
+relay4 = gpiozero.OutputDevice(RELAY_PIN_4, active_high=False, initial_value=False)
+relay5 = gpiozero.OutputDevice(RELAY_PIN_5, active_high=False, initial_value=False)
+relay6 = gpiozero.OutputDevice(RELAY_PIN_6, active_high=False, initial_value=False)
+relay7 = gpiozero.OutputDevice(RELAY_PIN_7, active_high=False, initial_value=False)
+relay8 = gpiozero.OutputDevice(RELAY_PIN_8, active_high=False, initial_value=False)
+
 # First, you need to register your application to get Client id and client secret
 # https://dev.twitch.tv/docs/authentication#registration
 
@@ -27,10 +60,10 @@ def get_token(client_id,client_secret,grant_type,scope):
 		r=json.loads(response.text)
 		return r
 	except requests.Timeout as err:
-		print("get_token timeout")
+		logger.error("get_token timeout")
 		return False
 	except Exception as e:
-		print("get_token network error")
+		logger.error("get_token network error")
 		return False
 
 # Check if the token is valid or not.
@@ -44,17 +77,17 @@ def is_valid_token(access_token):
 	}
 	try:
 		response = requests.request("GET", url, headers=headers,)
-		r=json.loads(response.text)
+		logger.info("valid token")
 		if "expires_in" in r :
 			if r['expires_in'] < 60*60*24: #1 day
 				return False
 		else:
 			return False
 	except requests.Timeout as err:
-		print("is_valid_token timeout")
+		logger.info("is_valid_token timeout")
 		return False
 	except Exception as e:
-		print("is_valid_token network error ")
+		logger.error("is_valid_token network error ")
 		return False	
 	return True
 
@@ -75,10 +108,10 @@ def get_last_hype_train_action(client_id,access_token,user_id):
 		response = requests.request("GET", url, headers=headers)
 		return json.loads(response.text)
 	except requests.Timeout as err:
-		print("get hype train action timeout")
+		logger.info("get hype train action timeout")
 		return False
 	except Exception as e:
-		print("get hype train action network error ")
+		logger.error("get hype train action network error ")
 		return False
 
 # Get broadcaster id from its username
@@ -96,10 +129,70 @@ def get_broadcaster_id(client_id,username):
 		r=json.loads(response.text)
 		return r['users'][0]
 	except requests.Timeout as err:
-		print("get_broadcaster_id timeout")
+		logger.error("get_broadcaster_id timeout")
 		return False
 	except Exception as e:
-		print("get_broadcaster_id network error ")
+		logger.error("get_broadcaster_id network error ")
+		return False
+
+# Get last follow information
+# https://dev.twitch.tv/docs/api/webhooks-reference#topic-user-follows
+
+def get_last_follow_action(client_id,access_token,user_id):
+	url = "https://api.twitch.tv/helix/users/follows?first=1&to_id="+ \
+		user_id
+	headers = {
+	  'Client-ID': client_id,
+	  'Authorization': 'Bearer '+access_token
+	}
+	try:
+		response = requests.request("GET", url, headers=headers)
+		return json.loads(response.text)
+	except requests.Timeout as err:
+		logger.error("get hype train action timeout")
+		return False
+	except Exception as e:
+		logger.error("get hype train action network error ")
+		return False
+
+# Get last subscription information
+# https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types#channelsubscribe
+
+def get_last_subscribe_action(client_id,access_token,user_id):
+	url = "https://api.twitch.tv/helix/subscriptions/events?broadcaster_id="+ \
+		user_id + \
+		"&first=1"
+	headers = {
+	  'Client-ID': client_id,
+	  'Authorization': 'Bearer '+access_token
+	}
+	try:
+		response = requests.request("GET", url, headers=headers)
+		return json.loads(response.text)
+	except requests.Timeout as err:
+		logger.error("get subscriber action timeout")
+		return False
+	except Exception as e:
+		logger.error("get subscriber action network error ")
+		return False
+
+# Get last Extension Transaction
+def get_last_transaction_action(client_id,access_token,user_id):
+	url = "https://api.twitch.tv/helix/extensions/transactions?extension_id="+ \
+		client_id + \
+		"&first=1"
+	headers = {
+	  'Client-ID': client_id,
+	  'Authorization': 'Bearer '+access_token
+	}
+	try:
+		response = requests.request("GET", url, headers=headers)
+		return json.loads(response.text)
+	except requests.Timeout as err:
+		logger.error("get transaction action timeout")
+		return False
+	except Exception as e:
+		logger.error("get transaction action network error ")
 		return False
 
 # Check if the train is active by comparing current UTC time with hype train `expires_at`
@@ -135,140 +228,180 @@ def is_user_live(client_id,access_token,username):
 			return False
 		return True
 	except requests.Timeout as err:
-		print("is_user_live timeout")
+		logger.error("is_user_live timeout")
 		return False
 	except Exception as e:
-		print("can not check if user live ")
+		logger.error("can not check if user live ")
 		return False
-
-
-
-# LED functions
-
-# This function will run when the train is inactive.
-# show random led pixel in random x, y location with a brightness range from 0.1 to 0.5
-# the function show or hide one pixel first, then hide random pixel
-
-def rand_pixel():
-	x =random.randint(1,15)
-	y =random.randint(1,5)
-	b =random.randint(0,5)/10
-	scrollphathd.set_pixel(x,y,b)
-	x =random.randint(1,15)
-	y =random.randint(1,5)
-	scrollphathd.set_pixel(x,y,0)
-	scrollphathd.show()
-	
-
-# Get the location of the number in the rectangle watch
-# giving sx as start X point and n as a number
-# return x and y location 
-	
-def get_loc(sx,n):
-	if n ==12:
-		n=0
-	if n ==0 or n == 6:
-		y=1
-		if n ==6:
-			y =5
-		return sx+1,y
-	if n <= 5:
-		y =n
-		x=sx+2
-		return x,y
-	if n >=7:
-		y =12-n
-		x =sx
-		return x,y
 
 # Cooldown
 # Show 12 base watch countdown after the train end.
 # based on this project: https://github.com/plusmnt/rectangle-scrollphathd-watch
 # take future as datetime object and subtract it from utc now
-# the output will be shown in the scrollphathd LED
 
 def show_time(future):
 	now=datetime.datetime.utcnow()
 	diff = future-now
-	print("Cooldown timer:",diff)
+	logger.info("Cooldown timer:" + str(diff))
 	time_str=str(diff).split(":")
 
-	#Draw 3 rectangles background
-	#sq: will give 1, 7, 13 as x starting point
-	for sq in range(1, 15, 6):
-		for sx in range(sq,sq+3):
-			for sy in range(1,6):
-				if sx ==sq+1 :
-					if sy !=1 and sy !=5:
-						continue
-				scrollphathd.set_pixel(sx,sy,0.13)
 
-#Draw ':'
-	scrollphathd.set_pixel(5,2,0.13)
-	scrollphathd.set_pixel(5,4,0.13)
-	scrollphathd.set_pixel(11,2,0.13)
-	scrollphathd.set_pixel(11,4,0.13)
+def set_stream(state):
+	if enable_stream==1:
+		try:
+			if relay1.value==state:
+				#do nothing
+				return True
+			if state==1:
+				#turn on relay
+				logger.info("set stream relay level " + str(state))
+				relay1.on()
+			if state==0:
+				#turn off relay
+				logger.info("set stream relay level " + str(state))
+				relay1.off()
+    			else:
+				#do nothing
+				return False
+			return True
+		except Exception as e:
+			logger.error("set stream error")
+			return False
 
-	#set time
-	second_12_base=int(float(time_str[2])/5+0.5)
-	sec_x,sec_y=get_loc(13,second_12_base)
-	scrollphathd.set_pixel(sec_x,sec_y,0.5)
-	
-	minute_12_base=int(int(time_str[1])/5+0.5)
-	if int(time_str[1]) != 0:
-		min_x,min_y=get_loc(7,minute_12_base)
-		scrollphathd.set_pixel(min_x,min_y,0.5)
+def set_hypetrain(hype_level):
+	if enable_hype==1:
+		try:
+			if hype_level==0:
+				#turn off all relays
+				if relay2.value==1:
+					relay2.off()
+				if relay3.value==1:
+					relay3.off()
+				if relay4.value==1:
+					relay4.off()
+				if relay5.value==1:
+					relay5.off()
+				if relay6.value==1:
+					logger.info("set hype level relay level " + str(hype_level))
+					relay6.off()
+				return True
+			if hype_level==1:
+				#turn on relay 2 only
+				if relay2.value==0:
+					logger.info("set hype level relay level " + str(hype_level))
+					relay2.on()
+				if relay3.value==1:
+					relay3.off()
+				if relay4.value==1:
+					relay4.off()
+				if relay5.value==1:
+					relay5.off()
+				if relay6.value==1:
+					relay6.off()
+				return True
+			if hype_level==2:
+				#turn on relay 2 + relay 3
+				if relay2.value==0:
+					relay2.on()
+				if relay3.value==0:
+					logger.info("set hype level relay level " + str(hype_level))
+					relay3.on()
+				if relay4.value==1:
+					relay4.off()
+				if relay5.value==1:
+					relay5.off()
+				if relay6.value==1:
+					relay6.off()
+				return True
+			if hype_level==3:
+				#turn on relay 2 + relay 3 + relay 4
+				if relay2.value==0:
+					relay2.on()
+				if relay3.value==0:
+					relay3.on()
+				if relay4.value==0:
+					logger.info("set hype level relay level " + str(hype_level))
+					relay4.on()
+				if relay5.value==1:
+					relay5.off()
+				if relay6.value==1:
+					relay6.off()
+				return True
+			if hype_level==4:
+				#turn on relay 2 + relay 3 + relay 4 + relay 5
+				if relay2.value==0:
+					relay2.on()
+				if relay3.value==0:
+					relay3.on()
+				if relay4.value==0:
+					relay4.on()
+				if relay5.value==0:
+					logger.info("set hype level relay level " + str(hype_level))
+					relay5.on()
+				if relay6.value==1:
+					relay6.off()
+				return True
+			if hype_level==5:
+				#turn on relay 2 + relay 3 + relay 4 + relay 5 + relay 6
+				if relay2.value==0:
+					relay2.on()
+				if relay3.value==0:
+					relay3.on()
+				if relay4.value==0:
+					relay4.on()
+				if relay5.value==0:
+					relay5.on()
+				if relay6.value==0:
+					logger.info("set hype level relay level " + str(hype_level))
+					relay6.on()
+				return True
+			else:
+				#do nothing
+				return False
+		except Exception as e:
+			logger.error("set hype train error")
+			return False
 
-	hour=int(time_str[0])
-	if hour !=0:
-		if hour >12:
-			hour=hour-12
-		hour_x,hour_y=get_loc(1,hour)
-		scrollphathd.set_pixel(hour_x,hour_y,0.5)
-	scrollphathd.show()
+def set_follow(state):
+	if enable_follow==1:
+		try:
+			if relay7.value==state:
+				#do nothing
+				return True
+			if state==1:
+				#turn on relay
+				logger.info("set follow state " + str(state))
+				relay7.on()
+			if state==0:
+				#turn off relay
+				logger.info("set follow state " + str(state))
+				relay7.off()
+  		  	else:
+				#do nothing
+				return False
+			return True
+		except Exception as e:
+			logger.error("set follow error")
+			return False
 
-
-# Active train function
-# show the progress and the level of hype train.
-# the function hype train level, pre as percentage (goal/total),  previous x value and previous y value.
-# from 1 to 11 x value it will show the progress of the train.
-# if the train passes 100% the LED will stop in the last level 5 dot.
-# the output will be shown in the scrollphatHD led display.
-
-def progress_show(level,per,prev_x,prev_y):
-
-	#max value for x in the led display
-	max_x=11
-	fix_x=prev_x
-	fix_y=prev_y
-	# get the upper value of the percentage e.g. 4.1 = 5
-	cal_x = math.ceil(per /10)
-	#print("Cal_x:",cal_x)
-	if cal_x >=max_x:
-		cal_x=max_x
-	for y in range(fix_y,level,1):
-		x_limit=max_x
-		if y == level-1:
-			x_limit=cal_x+1
-			if x_limit >= max_x:
-				x_limit =max_x
-		for x in range(fix_x,x_limit):
-			if prev_x !=1 or prev_y !=5 :
-				scrollphathd.set_pixel(prev_x,5-prev_y,0.1)
-			scrollphathd.set_pixel(x,5-y,0.3)
-			scrollphathd.clear_rect(x=13,y=1,width=3,height=5)
-			scrollphathd.write_string(str(y+1),x=13, y=1, font=font3x5, brightness=0.3)
-			scrollphathd.show()
-			time.sleep(0.1)
-			prev_x=x
-			prev_y=y
-		
-		fix_x=1
-
-	return prev_x,prev_y
-
-# clear ScrollpHatHD led display
-def clear_pixel():
-	scrollphathd.clear()
-	scrollphathd.show()
-
+def set_spare(state):
+	if enable_spare==1:
+		try:
+			if relay8.value==state:
+				#do nothing
+				return True
+			if state==1:
+				#turn on relay
+				logger.info("set spare " + str(state))
+				relay8.on()
+			if state==0:
+				#turn off relay
+				logger.info("set spare " + str(state))
+				relay8.off()
+  		  	else:
+				#do nothing
+				return False
+			return True
+		except Exception as e:
+			logger.error("set spare error")
+			return False

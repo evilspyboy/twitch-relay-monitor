@@ -8,6 +8,8 @@ The device itself uses the Twitch API so you need a Client ID and Secret from th
 
 When the run.py script is run the logic will run in a loop polling for events from Twtich then setting relays appropriately. The device theorectically could make up to 60 API reuqests per minute with the Twitch Rate limit being 120. There is some room for adjustment in the config file but do also allow for time for the electrical device to power on/off without being shorted out.
 
+Depending on how/where you use this you may need to adjust the /logs/ destination in the helper.py and run.py files to avoid errors or to actually get logs.
+
 ### Stream Online
 If a Stream is online all other conditions are valid for checks but the first relay is also set to give an "on air" notification via relay that can be connected to a 'live stream' or 'on air' type light/sign. While the stream is online the cycle for checks is increased for all other events while if the stream is offline the user_offline_wait_time is used to determine the speed of while loop cycles. The Stream Online functions may require revision as while the Hype Train and Follow functions use the newer Helix based Twitch APIs the Stream Online (and token retrieval) based APIs are not, this is due to there not being a Helix based option at this time.
 

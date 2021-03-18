@@ -14,7 +14,7 @@ grant_type="client_credentials"
 scope="channel:read:hype_train"
 
 # channel username 
-username="[twitch channel name]"
+username=""
 
 # time to wait between request if the user not streaming
 user_offline_wait_time=30 #60 seconds.

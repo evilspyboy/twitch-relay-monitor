@@ -6,6 +6,8 @@ So I know some people who host a weekly live show on Twitch and it was discussed
 # How to make
 Check the [hackaday.io Project Page](https://github.com/evilspyboy/twitch-relay-monitor) if you want to do all the 3D printing, laser cutting and assembly bits. There are copies of all the files there but also a link back here and a link to a copy of just the 3D printed parts + files for laser cutting shared on Thingiverse
 
+![What does it look like](images/PXL_20210317_050841789.jpg)
+
 ## How to use
 The device itself uses the Twitch API so you need a Client ID and Secret from the Twitch Developer Portal. As we are not retrieving any information that Twitch deems personal through these functions you do not necessarily have to have a API key created under the channel you are using this on but it does help to keep things together. Put the Client ID + Secret + Channel ID into the configuration file and you are 90% good to go if you have all the hardware configured and connected correctly (refer to the Hackaday.io for more on the hardware build + files).
 
